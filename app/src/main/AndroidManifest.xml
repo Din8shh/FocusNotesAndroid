@@ -3,6 +3,10 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Exact alarms so Pomodoro phase-end notifications fire while backgrounded.
+         USE_EXACT_ALARM is auto-granted on Android 13+; SCHEDULE_EXACT_ALARM covers 12. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
         android:name=".FocusNotesApplication"
@@ -25,6 +29,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".notification.PomodoroAlarmReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -13,7 +13,7 @@ import com.focusnotes.app.data.pomodoroPhase
 import com.focusnotes.app.model.PomodoroPhase
 import com.focusnotes.app.model.TaskStatus
 import com.focusnotes.app.model.TimerMode
-import com.focusnotes.app.notification.NotificationService
+import com.focusnotes.app.notification.PomodoroAlarmScheduler
 import com.focusnotes.app.settings.PomodoroSettings
 import com.focusnotes.app.timer.TimerCalc
 import com.focusnotes.app.util.Haptics
@@ -29,9 +29,12 @@ import kotlinx.coroutines.launch
 class TasksViewModel(
     private val repository: TaskRepository,
     private val settings: PomodoroSettings,
-    private val notifications: NotificationService,
+    private val scheduler: PomodoroAlarmScheduler,
     private val haptics: Haptics,
 ) : ViewModel() {
+
+    private val breakStartTitle = "Break time"
+    private val breakStartBody = "Take a short break before your next focus block."
 
     val workSeconds: Int get() = settings.workSeconds
     val breakSeconds: Int get() = settings.breakSeconds
@@ -176,6 +179,10 @@ class TasksViewModel(
                 updatedAt = now
             )
             repository.upsert(updated)
+            if (mode == TimerMode.POMODORO) {
+                // Fire at the end of the first focus block, even if the app is closed.
+                scheduler.schedule(now + workSeconds * 1000L, breakStartTitle, breakStartBody)
+            }
             haptics.medium()
         }
     }
@@ -198,6 +205,7 @@ class TasksViewModel(
                 updatedAt = now
             )
         )
+        scheduler.cancel()
         haptics.light()
     }
 
@@ -224,9 +232,12 @@ class TasksViewModel(
                     updatedAt = now
                 )
             )
-            notifications.notifyPhase(
-                "Break time",
-                "Take a short break before your next focus block."
+            // The just-fired alarm already notified about the break; schedule the
+            // alarm that ends the break and calls the user back to focus.
+            scheduler.schedule(
+                now + breakSeconds * 1000L,
+                "Focus block",
+                "Time to get back to ${current.title}."
             )
         } else {
             recordSession(current.id, TimerMode.POMODORO, phaseStartedAt, now, actualElapsed)
@@ -238,10 +249,7 @@ class TasksViewModel(
                     updatedAt = now
                 )
             )
-            notifications.notifyPhase(
-                "Focus block",
-                "Time to get back to ${current.title}."
-            )
+            scheduler.schedule(now + workSeconds * 1000L, breakStartTitle, breakStartBody)
         }
         haptics.success()
     }
@@ -275,7 +283,7 @@ class TasksViewModel(
                 return TasksViewModel(
                     container.repository,
                     container.settings,
-                    container.notifications,
+                    container.scheduler,
                     container.haptics
                 ) as T
             }
