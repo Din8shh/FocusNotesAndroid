@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- A simple "scope / focus target" mark, echoing the iOS app's focus icon. -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:fillColor="#00000000"
+        android:pathData="M54,30 A24,24 0 1 0 54.01,30 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M52.25,28 h3.5 v8 h-3.5 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M52.25,72 h3.5 v8 h-3.5 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M72,52.25 h8 v3.5 h-8 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M28,52.25 h8 v3.5 h-8 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,48 A6,6 0 1 0 54.01,48 Z" />
+</vector>
